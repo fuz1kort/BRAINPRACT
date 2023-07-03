@@ -6,9 +6,9 @@ import cv2
 # cv2.waitKey(0)
 
 # cap=cv2.VideoCapture("C:/Users/Marat/Videos/Counter-strike  Global Offensive/Counter-strike  Global Offensive 2021.05.03 - 09.28.55.02.mp4")
-cap = cv2.VideoCapture(0) #Первая вебка
+cap = cv2.VideoCapture(0) #Первая вебка ляляля
 cap.set(3, 500)
-cap.set(4, 500)
+cap.set(4, 300)
 
 while True:
     success, img = cap.read()

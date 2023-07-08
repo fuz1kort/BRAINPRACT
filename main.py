@@ -7,7 +7,7 @@ model = YOLO('yolov8.pt')
 cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
-    # Read a frame from the video
+
     success, frame = cap.read()
 
     if success:

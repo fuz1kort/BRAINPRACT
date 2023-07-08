@@ -1,18 +1,26 @@
 import cv2
+from ultralytics import YOLO
 
-# img = cv2.imread('C:/Users/Marat/Pictures/image.png')
-# cv2.imshow('Result', img)
-#
-# cv2.waitKey(0)
+# YOLO на видео в реальном режиме
+model = YOLO('yolov8.pt')
 
-# cap=cv2.VideoCapture("C:/Users/Marat/Videos/Counter-strike  Global Offensive/Counter-strike  Global Offensive 2021.05.03 - 09.28.55.02.mp4")
-cap = cv2.VideoCapture(0) #Первая вебка 1 коммит
-cap.set(3, 500)
-cap.set(4, 800)
+cap = cv2.VideoCapture(0)
 
-while True:
-    success, img = cap.read()
-    cv2.imshow('Result', img)
+while cap.isOpened():
+    # Read a frame from the video
+    success, frame = cap.read()
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if success:
+        results = model(frame)
+
+        annotated_frame = results[0].plot()
+
+        cv2.imshow("YOLOv8 Inference", annotated_frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+             break
+    else:
         break
+
+cap.release()
+cv2.destroyAllWindows()

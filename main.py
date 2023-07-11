@@ -1,26 +1,48 @@
-import cv2
-from ultralytics import YOLO
+import mediapipeIM
+import yolov5IM
 
-# YOLO на видео в реальном режиме
-model = YOLO('yolov8.pt')
+mediapipe = None
+yolo = None
 
-cap = cv2.VideoCapture(0)
 
-while cap.isOpened():
+def setup_mediapipe():
+    global mediapipe
+    mediapipe = mediapipeIM
+    return  mediapipe
+def setup_yolo():
+    global yolo
+    yolo = yolov5IM
+    return yolo
 
-    success, frame = cap.read()
+def has_hands(frame, thresh, model):
+    global mediapipe
+    global yolo
+    if model == "mediapipe":
+        if mediapipe == None:
+            mediapipe = setup_mediapipe()
+            if mediapipe.mediapipe_for_images([frame]):
+                return True
+            return False
+        elif mediapipe.mediapipe_for_images([frame]):
+            return True
+        return False
+    elif model == "handobj":
+        if yolo == None:
+            yolo = setup_yolo()
+            res = yolo.yolo_for_image([frame])
+            for _, obj in res.pandas().xyxy[0].iterrows():
+                if obj["name"] == "hand" and obj["confidence"] > thresh:
+                    return True
+            return False
+        else:
+            res = yolo.yolo_for_image([frame])
+            for _, obj in res.pandas().xyxy[0].iterrows():
+                if obj["name"] == "hand" and obj["confidence"] > thresh:
+                    return True
+            return False
 
-    if success:
-        results = model(frame)
 
-        annotated_frame = results[0].plot()
+IMAGE_FILES = ['images/1 (1).jpg', "images/1 (2).jpg"]
 
-        cv2.imshow("YOLOv8 Inference", annotated_frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-             break
-    else:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+for frame in IMAGE_FILES:
+    print(has_hands(frame, 0.8, "handobj"))
